@@ -1,0 +1,106 @@
+version: '3.9'
+
+services:
+  frontend:
+    depends_on:
+      - backend
+    extends:
+      file: ./services/frontend.yml
+      service: frontend
+    environment:
+      NEXT_PUBLIC_STATS_API_HOST:     http://localhost:3021/
+      NEXT_PUBLIC_VISUALIZE_API_HOST: http://localhost:3031/
+
+      NEXT_PUBLIC_API_PROTOCOL:       http
+      NEXT_PUBLIC_API_HOST:           localhost
+      NEXT_PUBLIC_API_PORT:           3001 # it is set in nginx
+
+      NEXT_PUBLIC_APP_PROTOCOL:       http
+      NEXT_PUBLIC_APP_HOST:           localhost
+      NEXT_PUBLIC_APP_PORT:           3000
+    ports:
+      - "3000:3000"
+
+  backend:
+    depends_on:
+      - db
+      - redis-db
+    extends:
+      file: ./services/backend.yml
+      service: backend
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+      args:
+        RELEASE_VERSION: 6.10.1
+    links:
+      - db:database
+    environment:
+      ETHEREUM_JSONRPC_HTTP_URL:  http://host.docker.internal:9944/
+      ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:9944/
+
+      CHAIN_ID: 4222
+      PORT: 3010
+    ports:
+      - "3010:3010"
+
+  stats:
+    depends_on:
+      - stats-db
+      - backend
+    extends:
+      file: ./services/stats.yml
+      service: stats
+    ports:
+      - "3020:8050"
+
+  visualizer:
+    extends:
+      file: ./services/visualizer.yml
+      service: visualizer
+    ports:
+      - "3030:8050"
+
+  stats-db:
+    depends_on:
+      stats-db-init:
+        condition: service_completed_successfully
+    extends:
+      file: ./services/stats.yml
+      service: stats-db
+
+  stats-db-init:
+    extends:
+      file: ./services/stats.yml
+      service: stats-db-init
+
+  redis-db:
+    extends:
+      file: ./services/redis.yml
+      service: redis-db
+
+  db-init:
+    extends:
+      file: ./services/db.yml
+      service: db-init
+
+  db:
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    extends:
+      file: ./services/db.yml
+      service: db
+
+  sig-provider:
+    extends:
+      file: ./services/sig-provider.yml
+      service: sig-provider
+
+  user-ops-indexer:
+    depends_on:
+      - db
+      - backend
+    extends:
+      file: ./services/user-ops-indexer.yml
+      service: user-ops-indexer
