@@ -8,16 +8,17 @@ services:
       file: ./services/frontend.yml
       service: frontend
     environment:
-      NEXT_PUBLIC_STATS_API_HOST:     http://localhost:3021/
-      NEXT_PUBLIC_VISUALIZE_API_HOST: http://localhost:3031/
+      # NEXT_PUBLIC_STATS_API_HOST:         http://localhost:3021/
+      # NEXT_PUBLIC_VISUALIZE_API_HOST:     http://localhost:3031/
 
-      NEXT_PUBLIC_API_PROTOCOL:       http
-      NEXT_PUBLIC_API_HOST:           localhost
-      NEXT_PUBLIC_API_PORT:           3001 # it is set in nginx
+      NEXT_PUBLIC_API_PROTOCOL:           http # http | https
+      NEXT_PUBLIC_API_HOST:               localhost
+      NEXT_PUBLIC_API_PORT:               3001 # 443 if https
+      NEXT_PUBLIC_API_WEBSOCKET_PROTOCOL: ws   # ws | wss
 
-      NEXT_PUBLIC_APP_PROTOCOL:       http
-      NEXT_PUBLIC_APP_HOST:           localhost
-      NEXT_PUBLIC_APP_PORT:           3000
+      NEXT_PUBLIC_APP_PROTOCOL:           http
+      NEXT_PUBLIC_APP_HOST:               localhost
+      NEXT_PUBLIC_APP_PORT:               3000 # 443 if https
     ports:
       - "3000:3000"
     logging:
@@ -54,55 +55,55 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  stats:
-    depends_on:
-      - stats-db
-      - backend
-    extends:
-      file: ./services/stats.yml
-      service: stats
-    ports:
-      - "3020:8050"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+  # stats:
+  #   depends_on:
+  #     - stats-db
+  #     - backend
+  #   extends:
+  #     file: ./services/stats.yml
+  #     service: stats
+  #   ports:
+  #     - "3020:8050"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
 
-  visualizer:
-    extends:
-      file: ./services/visualizer.yml
-      service: visualizer
-    ports:
-      - "3030:8050"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+  # visualizer:
+  #   extends:
+  #     file: ./services/visualizer.yml
+  #     service: visualizer
+  #   ports:
+  #     - "3030:8050"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
 
-  stats-db:
-    depends_on:
-      stats-db-init:
-        condition: service_completed_successfully
-    extends:
-      file: ./services/stats.yml
-      service: stats-db
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+  # stats-db:
+  #   depends_on:
+  #     stats-db-init:
+  #       condition: service_completed_successfully
+  #   extends:
+  #     file: ./services/stats.yml
+  #     service: stats-db
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
 
-  stats-db-init:
-    extends:
-      file: ./services/stats.yml
-      service: stats-db-init
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+  # stats-db-init:
+  #   extends:
+  #     file: ./services/stats.yml
+  #     service: stats-db-init
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "10m"
+  #       max-file: "3"
 
   redis-db:
     extends:
