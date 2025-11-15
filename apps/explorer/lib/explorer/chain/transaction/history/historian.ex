@@ -5,11 +5,13 @@ defmodule Explorer.Chain.Transaction.History.Historian do
   require Logger
   use Explorer.History.Historian
 
-  alias Explorer.{Chain, Repo}
   alias Explorer.Chain.{Block, DenormalizationHelper, Transaction}
+  alias Explorer.Chain.Block.Reader.General, as: BlockGeneralReader
+  alias Explorer.Chain.Cache.Counters.LastFetchedCounter
   alias Explorer.Chain.Events.Publisher
   alias Explorer.Chain.Transaction.History.TransactionStats
   alias Explorer.History.Process, as: HistoryProcess
+  alias Explorer.Repo
 
   import Ecto.Query, only: [from: 2, subquery: 1]
 
@@ -79,8 +81,8 @@ defmodule Explorer.Chain.Transaction.History.Historian do
       from_api = false
 
       # Try to identify block range for the given day
-      with {:ok, min_block} <- Chain.timestamp_to_block_number(earliest, :after, from_api),
-           {:ok, max_block} <- Chain.timestamp_to_block_number(latest, :before, from_api) do
+      with {:ok, min_block} <- BlockGeneralReader.timestamp_to_block_number(earliest, :after, from_api),
+           {:ok, max_block} <- BlockGeneralReader.timestamp_to_block_number(latest, :before, from_api) do
         # Collects stats for the block range determining the given day and add
         # the date determining the day to the record.
         record =
@@ -252,6 +254,12 @@ defmodule Explorer.Chain.Transaction.History.Historian do
 
     Logger.info("tx/per day chart: number of inserted #{num_inserted}")
 
+    # we need to store the last timestamp of success to use it in Indexer.Fetcher.MultichainSearchDb.CountersFetcher
+    LastFetchedCounter.upsert(%{
+      counter_type: transaction_stats_last_save_records_timestamp(),
+      value: DateTime.to_unix(DateTime.utc_now())
+    })
+
     Publisher.broadcast(:transaction_stats)
     num_inserted
   end
@@ -267,5 +275,17 @@ defmodule Explorer.Chain.Transaction.History.Historian do
   @spec date_today() :: Date.t()
   defp date_today do
     HistoryProcess.config_or_default(:utc_today, Date.utc_today(), __MODULE__)
+  end
+
+  @doc """
+    Defines a name of counter type for LastFetchedCounter row
+    storing the last timestamp of when the `save_records` function was called.
+
+    ## Returns
+    - The counter type name.
+  """
+  @spec transaction_stats_last_save_records_timestamp() :: String.t()
+  def transaction_stats_last_save_records_timestamp do
+    "transaction_stats_last_save_records_timestamp"
   end
 end
