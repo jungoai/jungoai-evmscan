@@ -8,17 +8,23 @@ services:
       file: ./services/frontend.yml
       service: frontend
     environment:
-      # NEXT_PUBLIC_STATS_API_HOST:         http://localhost:3021/
-      # NEXT_PUBLIC_VISUALIZE_API_HOST:     http://localhost:3031/
-
-      NEXT_PUBLIC_API_PROTOCOL:           http # http | https
-      NEXT_PUBLIC_API_HOST:               localhost
-      NEXT_PUBLIC_API_PORT:               3001 # 443 if https
-      NEXT_PUBLIC_API_WEBSOCKET_PROTOCOL: ws   # ws | wss
-
-      NEXT_PUBLIC_APP_PROTOCOL:           http
-      NEXT_PUBLIC_APP_HOST:               localhost
-      NEXT_PUBLIC_APP_PORT:               3000 # 443 if https
+      NEXT_PUBLIC_NETWORK_NAME:               Symmchain
+      NEXT_PUBLIC_NETWORK_SHORT_NAME:         Symmchain
+      NEXT_PUBLIC_NETWORK_CURRENCY_NAME:      Symmt
+      NEXT_PUBLIC_NETWORK_CURRENCY_SYMBOL:    SYMMT
+      NEXT_PUBLIC_NETWORK_CURRENCY_DECIMALS:  18
+      # API
+      NEXT_PUBLIC_API_PROTOCOL:               http # http | https
+      NEXT_PUBLIC_API_HOST:                   localhost
+      NEXT_PUBLIC_API_PORT:                   3001 # 443 if https
+      NEXT_PUBLIC_API_WEBSOCKET_PROTOCOL:     ws   # ws | wss
+      # Assets
+      NEXT_PUBLIC_APP_PROTOCOL:               http
+      NEXT_PUBLIC_APP_HOST:                   localhost
+      NEXT_PUBLIC_APP_PORT:                   3000 # 443 if https
+      #
+      # NEXT_PUBLIC_STATS_API_HOST:             http://localhost:3021/
+      # NEXT_PUBLIC_VISUALIZE_API_HOST:         http://localhost:3031/
     ports:
       - "3000:3000"
     logging:
@@ -42,11 +48,13 @@ services:
     links:
       - db:database
     environment:
-      ETHEREUM_JSONRPC_HTTP_URL:  http://host.docker.internal:9944/
-      ETHEREUM_JSONRPC_TRACE_URL: http://host.docker.internal:9944/
-
-      CHAIN_ID: 4222
-      PORT: 3010
+      CHAIN_ID:   391120
+      COIN_NAME:  SYMMT
+      PORT:       3010
+      # RPC endpoint to fetch
+      ETHEREUM_JSONRPC_HTTP_URL:  https://symmchain-node1.muon.net
+      ETHEREUM_JSONRPC_TRACE_URL: https://symmchain-node1.muon.net
+      # ETHEREUM_JSONRPC_HTTP_URLS:
     ports:
       - "3010:3010"
     logging:
