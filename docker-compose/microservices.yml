@@ -19,12 +19,14 @@ services:
       service: smart-contract-verifier
     ports:
       - 8082:8050
+    logging: *default-logging
 
   # stats-db-init:
   #   extends:
   #     file: ./services/stats.yml
   #     service: stats-db-init
-
+  #   logging: *default-logging
+  #
   # stats-db:
   #   depends_on:
   #     stats-db-init:
@@ -32,18 +34,21 @@ services:
   #   extends:
   #     file: ./services/stats.yml
   #     service: stats-db
-
+  #   logging: *default-logging
+  #
   # stats:
   #   depends_on:
   #     - stats-db
   #   extends:
   #     file: ./services/stats.yml
   #     service: stats
+  #   logging: *default-logging
 
   # user-ops-indexer:
   #   extends:
   #     file: ./services/user-ops-indexer.yml
   #     service: user-ops-indexer
+  #   logging: *default-logging
 
   # proxy:
   #   depends_on:
@@ -54,3 +59,10 @@ services:
   #     service: proxy
   #   volumes:
   #     - "./proxy/microservices.conf.template:/etc/nginx/templates/default.conf.template"
+  #   logging: *default-logging
+
+x-logging:    &default-logging
+  driver:     "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"

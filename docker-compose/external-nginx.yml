@@ -27,11 +27,7 @@ services:
       # NEXT_PUBLIC_VISUALIZE_API_HOST:         http://localhost:3031/
     ports:
       - "3000:3000"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    logging: *default-logging
 
   backend:
     depends_on:
@@ -57,11 +53,7 @@ services:
       # ETHEREUM_JSONRPC_HTTP_URLS:
     ports:
       - "3010:3010"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    logging: *default-logging
 
   # stats:
   #   depends_on:
@@ -72,11 +64,7 @@ services:
   #     service: stats
   #   ports:
   #     - "3020:8050"
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+  #   logging: *default-logging
 
   # visualizer:
   #   extends:
@@ -84,11 +72,7 @@ services:
   #     service: visualizer
   #   ports:
   #     - "3030:8050"
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+  #   logging: *default-logging
 
   # stats-db:
   #   depends_on:
@@ -97,41 +81,25 @@ services:
   #   extends:
   #     file: ./services/stats.yml
   #     service: stats-db
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+  #   logging: *default-logging
 
   # stats-db-init:
   #   extends:
   #     file: ./services/stats.yml
   #     service: stats-db-init
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       max-size: "10m"
-  #       max-file: "3"
+  #   logging: *default-logging
 
   redis-db:
     extends:
       file: ./services/redis.yml
       service: redis-db
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    logging: *default-logging
 
   db-init:
     extends:
       file: ./services/db.yml
       service: db-init
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    logging: *default-logging
 
   db:
     depends_on:
@@ -140,21 +108,13 @@ services:
     extends:
       file: ./services/db.yml
       service: db
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    logging: *default-logging
 
   sig-provider:
     extends:
       file: ./services/sig-provider.yml
       service: sig-provider
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    logging: *default-logging
 
   user-ops-indexer:
     depends_on:
@@ -163,8 +123,10 @@ services:
     extends:
       file: ./services/user-ops-indexer.yml
       service: user-ops-indexer
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    logging: *default-logging
+
+x-logging:    &default-logging
+  driver:     "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
