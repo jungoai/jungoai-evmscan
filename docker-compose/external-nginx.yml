@@ -1,5 +1,11 @@
 version: '3.9'
 
+x-logging:    &default-logging
+  driver:     "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   frontend:
     depends_on:
@@ -124,9 +130,3 @@ services:
       file: ./services/user-ops-indexer.yml
       service: user-ops-indexer
     logging: *default-logging
-
-x-logging:    &default-logging
-  driver:     "json-file"
-  options:
-    max-size: "10m"
-    max-file: "3"

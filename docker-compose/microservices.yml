@@ -1,5 +1,11 @@
 version: '3.9'
 
+x-logging:    &default-logging
+  driver:     "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   # visualizer:
   #   extends:
@@ -60,9 +66,3 @@ services:
   #   volumes:
   #     - "./proxy/microservices.conf.template:/etc/nginx/templates/default.conf.template"
   #   logging: *default-logging
-
-x-logging:    &default-logging
-  driver:     "json-file"
-  options:
-    max-size: "10m"
-    max-file: "3"
